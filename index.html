@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DAVA DOST | Dawa ka dost, sehat ka sathi</title>
+<style>
+  body { font-family: Arial, Helvetica, sans-serif; background: #ffffff; color: #222; max-width: 1000px; margin: 0 auto; padding: 16px; line-height: 1.4; }
+  h1 { font-size: 24px; margin: 0 0 4px 0; }
+  h2 { font-size: 20px; border-bottom: 1px solid #ccc; padding-bottom: 4px; margin-top: 24px; }
+  h3 { font-size: 16px; margin-top: 20px; }
+  button { padding: 6px 12px; margin: 2px; border: 1px solid #555; background: #f0f0f0; cursor: pointer; font-size: 14px; }
+  button:disabled { color: #999; cursor: not-allowed; border-color: #bbb; }
+  button.active { background: #222; color: #fff; }
+  input, select { padding: 5px; font-size: 14px; margin: 2px; }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+  th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; font-size: 14px; vertical-align: top; }
+  th { background: #f3f3f3; }
+  .cards { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; }
+  .card { border: 1px solid #bbb; padding: 10px 14px; min-width: 170px; }
+  .card .big { font-size: 24px; font-weight: bold; }
+  .small { color: #555; font-size: 13px; }
+  .alertbox { border: 2px solid #c77700; background: #fff7e6; padding: 8px 12px; margin: 10px 0; }
+  .noticebox { border: 1px solid #999; background: #f7f7f7; padding: 8px 12px; margin: 10px 0; }
+  .msg-error { color: #b00020; }
+  .msg-ok { color: #1b5e20; }
+  .st-taken { color: #1b5e20; font-weight: bold; }
+  .st-skipped { color: #8a6d00; font-weight: bold; }
+  .st-missed { color: #b00020; font-weight: bold; }
+  .st-pending { color: #555; }
+  .st-due { color: #c77700; font-weight: bold; }
+  .st-overdue { color: #b00020; }
+  .chip { display: inline-block; border: 1px solid #888; padding: 2px 8px; margin: 2px; }
+  .row { margin: 10px 0; }
+  .barbg { background: #eee; height: 16px; border: 1px solid #ccc; }
+  .bar { height: 100%; }
+  .bar-taken { background: #2e7d32; }
+  .bar-skipped { background: #f9a825; }
+  .bar-missed { background: #c62828; }
+  .bar-pending { background: #9e9e9e; }
+  progress { width: 100%; height: 18px; }
+  @media print { nav, button, .noprint { display: none; } }
+
+/* ===== DAVA DOST visual refresh ===== */
+:root{
+  --teal:#087F78;--mint:#B9E7DE;--bg:#F4FAF8;--navy:#263C4A;
+  --white:#FFFFFF;--muted:#647780;--line:#DCEAE6;--soft:#EAF5F2;
+  --shadow:0 8px 24px rgba(38,60,74,.08);
+}
+*{box-sizing:border-box}
+body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--navy);
+ max-width:1180px;margin:0 auto;padding:24px;line-height:1.55}
+#appTitle{font-size:27px;font-weight:800;letter-spacing:-.7px;color:var(--teal);margin:0}
+#patientLine{margin:2px 0 18px;color:var(--muted)}
+h2{font-size:23px;color:var(--navy);border:0;margin:4px 0 18px;padding:0}
+h3{font-size:17px;color:var(--navy);margin:24px 0 12px}
+.page-tagline{margin:-10px 0 18px;color:var(--teal);font-size:17px;font-weight:750;letter-spacing:.1px}
+
+#nav{display:flex;flex-wrap:wrap;gap:7px;padding:10px;background:#fff;border:1px solid var(--line);
+ border-radius:16px;box-shadow:var(--shadow);margin:14px 0 20px}
+button{border:0;border-radius:10px;background:var(--soft);color:var(--teal);padding:10px 15px;
+ font-weight:650;cursor:pointer;transition:.15s ease;font-size:14px}
+button:hover{background:var(--mint);transform:translateY(-1px)}
+button.active{background:var(--teal);color:white}
+button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+input,select{border:1px solid #CBDCD7;border-radius:9px;padding:10px 11px;background:#fff;color:var(--navy);max-width:100%}
+input:focus,select:focus{outline:2px solid var(--mint);border-color:var(--teal)}
+.view{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:var(--shadow);margin:16px 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:14px;margin:16px 0}
+.card{background:linear-gradient(145deg,#fff,#F1F9F6);border:1px solid var(--line);border-radius:16px;
+ padding:18px;min-width:0;box-shadow:0 4px 14px rgba(38,60,74,.04)}
+.card .big{font-size:28px;color:var(--teal);margin-top:5px}
+.small{color:var(--muted)}
+.noticebox,.alertbox{border:1px solid var(--line);background:#F5FAF8;border-radius:13px;padding:14px 16px;margin:14px 0}
+.alertbox{border-color:#E8C98B;background:#FFF9ED}
+table{border-collapse:separate;border-spacing:0;width:100%;margin:12px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+th,td{border:0;border-bottom:1px solid var(--line);padding:11px 12px;text-align:left;font-size:14px;vertical-align:middle}
+th{background:#EAF5F2;color:var(--navy);font-weight:700}
+tr:last-child td{border-bottom:0}
+tr:nth-child(even) td{background:#FBFDFC}
+.chip{border:1px solid var(--line);background:var(--soft);border-radius:20px;padding:5px 9px}
+.barbg{background:#E8F0ED;border:0;border-radius:20px;overflow:hidden}
+.bar{border-radius:20px}
+progress{accent-color:var(--teal);height:12px;border-radius:20px;overflow:hidden}
+.st-taken{color:#087F78;font-weight:700}.st-skipped{color:#9A6A08;font-weight:700}
+.st-missed{color:#B54747;font-weight:700}.st-pending{color:#647780}.st-due{color:#B36B13;font-weight:700}
+#landing{display:none}
+.welcome #nav,.welcome #banner,.welcome .view{display:none!important}
+.welcome #landing{display:block}
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#B9E7DE 0%,#EAF7F3 100%);
+ border-radius:26px;padding:clamp(30px,6vw,72px);min-height:390px;display:flex;align-items:center;
+ box-shadow:var(--shadow);border:1px solid #D1ECE5}
+.hero-copy{max-width:620px;position:relative;z-index:1}
+.brand-mark{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;
+ background:var(--teal);color:#fff;border-radius:16px;font-size:27px;margin-bottom:18px}
+.hero h1{font-size:clamp(32px,5vw,54px);line-height:1.08;letter-spacing:-1.5px;color:var(--navy);margin:0 0 14px}
+.hero .tagline{font-size:18px;font-weight:750;color:var(--teal);margin:0 0 24px}
+.hero p{font-size:16px;color:#4D626A;max-width:510px}
+.hero .primary{background:var(--teal);color:white;padding:13px 24px;border-radius:12px;font-size:15px;margin-top:12px}
+.hero-art{position:absolute;right:7%;top:50%;transform:translateY(-50%);font-size:clamp(100px,17vw,190px);
+ opacity:.18;filter:grayscale(1)}
+#landing .landing-note{text-align:center;color:var(--muted);font-size:13px;margin:16px}
+.row{margin:13px 0}
+form .row{padding:4px 0}
+#medForm{max-width:760px}
+#medForm .row{margin:16px 0}
+#medMsg{font-weight:650}
+@media(max-width:700px){
+ body{padding:14px}
+ .view{padding:17px}
+ #nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ #nav button{width:100%;padding:10px 6px}
+ .hero{min-height:420px;padding:28px 22px;align-items:flex-start}
+ .hero-art{right:4%;top:auto;bottom:12px;transform:none;font-size:115px}
+ table{display:block;overflow-x:auto;white-space:nowrap}
+}
+@media print{body{background:white;padding:0}.view{box-shadow:none;border:0}}
+
+/* ===== Pastel colour pass: DAVA DOST ===== */
+:root{
+  --teal:#087F78;
+  --mint:#B9E7DE;
+  --navy:#263C4A;
+  --bg:#F4FAF8;
+  --peach:#FCE8C8;
+  --lavender:#E6DDF5;
+  --blue:#DCEAF7;
+  --pink:#F8DFDF;
+  --yellow:#F7F0C9;
+}
+.hero .tagline{
+  font-size:clamp(23px,3vw,29px);
+  line-height:1.25;
+  font-weight:800;
+  color:var(--teal);
+  margin:0 0 18px;
+}
+.hero h1{
+  font-size:clamp(28px,3.6vw,39px);
+  line-height:1.12;
+  letter-spacing:-.8px;
+  margin:0 0 14px;
+}
+.view{
+  background:linear-gradient(145deg,#FFFFFF 0%,#F8FCFB 100%);
+}
+.view h3{
+  padding-bottom:7px;
+  border-bottom:2px solid #DCEAE6;
+}
+.cards .card{
+  border:1px solid rgba(38,60,74,.08);
+  box-shadow:0 5px 16px rgba(38,60,74,.06);
+}
+.cards .card:nth-child(6n+1){background:linear-gradient(145deg,#E2F4EF,#CDEBE3);border-color:#B9E7DE}
+.cards .card:nth-child(6n+2){background:linear-gradient(145deg,#FFF3DF,#FCE8C8);border-color:#F2D8AD}
+.cards .card:nth-child(6n+3){background:linear-gradient(145deg,#F1EBFA,#E6DDF5);border-color:#D8CBEA}
+.cards .card:nth-child(6n+4){background:linear-gradient(145deg,#EDF5FC,#DCEAF7);border-color:#C9DDED}
+.cards .card:nth-child(6n+5){background:linear-gradient(145deg,#FCECEC,#F8DFDF);border-color:#EFD0D0}
+.cards .card:nth-child(6n){background:linear-gradient(145deg,#FBF7DE,#F7F0C9);border-color:#E9E0B1}
+.cards .card .big{color:#245E62}
+.noticebox{
+  background:linear-gradient(135deg,#EAF5FC,#F3F0FA);
+  border:1px solid #D6E2F0;
+}
+.alertbox{
+  background:linear-gradient(135deg,#FFF1DF,#FCE8C8);
+  border:1px solid #EFD2A7;
+}
+table{background:#fff}
+th{background:#E5EEF8;color:#263C4A}
+tbody tr:nth-child(6n+1) td, table tr:nth-child(6n+2) td{background:#F0F8F5}
+table tr:nth-child(6n+3) td{background:#FFF7EA}
+table tr:nth-child(6n+4) td{background:#F5F0FB}
+table tr:nth-child(6n+5) td{background:#EFF5FC}
+table tr:nth-child(6n) td{background:#FFF1F1}
+#medForm{
+  background:linear-gradient(145deg,#F3F0FA,#F0F8F5);
+  border:1px solid #DED7EC;
+  border-radius:16px;
+  padding:20px;
+}
+#medForm h3{border-bottom-color:#D8CBEA}
+.chip{background:#E6DDF5;border-color:#D8CBEA;color:#493B63}
+button[data-status="taken"]{background:#D7EFE6;color:#17634F}
+button[data-status="skipped"]{background:#FFF0D5;color:#805A12}
+button[data-status="missed"]{background:#F8DFDF;color:#963D3D}
+button[data-action="editMed"]{background:#DCEAF7;color:#315A7A}
+button[data-action="deleteMed"]{background:#F8DFDF;color:#963D3D}
+button[data-action="reset"]{background:#E6DDF5;color:#594A70}
+@media(max-width:700px){
+  #medForm{padding:14px}
+  .hero .tagline{font-size:23px}
+  .hero h1{font-size:31px}
+}
+
+/* ===== Sidebar layout (v2) ===== */
+body{max-width:1240px}
+.welcome #app{display:none!important}
+#app{background:#fff;border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);overflow:hidden}
+.app-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+ background:linear-gradient(180deg,#118A83,#087F78);color:#fff;padding:20px 26px}
+.app-logo{display:flex;align-items:center;gap:12px}
+.app-logo svg{flex:none}
+#appTitle{color:#fff;font-size:30px;font-weight:700;letter-spacing:-.3px;margin:0}
+.header-tag{color:#fff;font-size:17px}
+.app-body{display:grid;grid-template-columns:minmax(220px,300px) 1fr;min-height:620px}
+#nav{display:flex;flex-direction:column;flex-wrap:nowrap;gap:12px;background:#E4F3EF;border:0;border-radius:0;
+ box-shadow:none;margin:0;padding:18px 16px}
+#nav .nav-title{font-size:24px;font-weight:600;margin:0 0 6px;color:#14232b}
+#nav button{width:100%;text-align:left;background:#fff;color:var(--navy);border-radius:14px;
+ padding:17px 16px;font-size:17px;font-weight:600}
+#nav button:hover{background:var(--mint);transform:none}
+#nav button.active{background:var(--teal);color:#fff}
+#nav #patientLine{margin:8px 4px 0}
+.app-main{background:#FCFCFC;padding:26px 26px 30px;min-width:0}
+.app-main .view{background:transparent;border:0;box-shadow:none;border-radius:0;padding:0;margin:0}
+.app-main .view h2{font-size:32px;font-weight:600;color:#14232b;margin:0 0 6px}
+.welcome-line{color:var(--muted);font-size:20px;margin:0 0 18px}
+#dashBody .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+#dashBody .cards .card{border-radius:18px;padding:18px 20px;border:0;box-shadow:none}
+#dashBody .cards .card .small:first-child{font-size:18px;color:#14232b}
+#dashBody .cards .card .big{font-size:36px;font-weight:600;color:#14232b;margin-top:14px}
+#banner{margin-bottom:6px}
+.hero-slogan{font-size:clamp(36px,6vw,64px)!important;line-height:1.08!important;letter-spacing:-1.5px!important;margin:0 0 20px!important;color:var(--navy)}
+.hero-slogan span{color:var(--teal)}
+@media(max-width:800px){
+  .app-body{grid-template-columns:1fr;min-height:0}
+  #nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  #nav .nav-title,#nav #patientLine{grid-column:1/-1}
+  #nav button{padding:12px 12px;font-size:15px}
+  .app-main{padding:18px 14px}
+  .header-tag{font-size:14px}
+  #appTitle{font-size:24px}
+  #dashBody .cards{grid-template-columns:1fr 1fr;gap:10px}
+  #dashBody .cards .card .big{font-size:28px}
+}
+@media print{#app{border:0;box-shadow:none}.app-body{display:block}.app-header{background:none;color:#000}#appTitle{color:#000}}
+
+</style>
+</head>
+<body class="welcome">
+
+<section id="landing">
+  <div class="hero">
+    <div class="hero-copy">
+      <div class="brand-mark">✚</div>
+      <h1 class="hero-slogan">Dawa ka dost,<br><span>Sehat ka sathi.</span></h1>
+      <p>Keep your medicines organised, remember your doses, and track your daily medication routine — all in one simple place.</p>
+      <button type="button" class="primary" id="getStartedBtn">Get Started&nbsp; →</button>
+    </div>
+    <div class="hero-art" aria-hidden="true">♡</div>
+  </div>
+  <p class="landing-note">A simpler way to stay on track with your medicines.</p>
+</section>
+
+<div id="app">
+<header class="app-header">
+  <div class="app-logo">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12.6 12 20l-7.5-7.4A5 5 0 0 1 12 6.2a5 5 0 0 1 7.5 6.4Z"/><path d="M3.5 12h4l1.5-3 3 6 1.5-3h4"/></svg>
+    <h1 id="appTitle"></h1>
+  </div>
+  <span class="header-tag">Your health companion</span>
+</header>
+<div class="app-body">
+<nav id="nav" class="noprint">
+  <h2 class="nav-title">Navigation</h2>
+  <button data-view="dashboard">Dashboard</button>
+  <button data-view="medicines">Medicines</button>
+  <button data-view="reminders">Reminders</button>
+  <button data-view="today">Dose Tracking</button>
+  <button data-view="history">History</button>
+  <button data-view="report">Weekly Report</button>
+  <button data-view="caregiver">Caregiver View</button>
+  <p class="small" id="patientLine"></p>
+</nav>
+
+<main class="app-main">
+<div id="banner"></div>
+
+<!-- ===================== 1. DASHBOARD ===================== -->
+<section id="view-dashboard" class="view">
+  <h2>Dashboard</h2>
+  <p class="welcome-line">Welcome back!</p>
+  <div id="dashBody"></div>
+
+  <h3>Data and settings</h3>
+  <div class="noticebox">
+    <div class="row">
+      Patient name: <input type="text" id="patientNameInput" size="24">
+      <button type="button" id="saveNameBtn">Save name</button>
+    </div>
+    <div class="row">
+      <button type="button" id="loadSampleBtn">Load sample data (for demo)</button>
+      <button type="button" id="clearDataBtn">Delete ALL saved data</button>
+    </div>
+    <p class="small">Sample data replaces everything you have saved with 4 example medicines and about 2 weeks of example dose history. All data is stored only in this browser (LocalStorage).</p>
+  </div>
+</section>
+
+<!-- ===================== 2. MEDICINES ===================== -->
+<section id="view-medicines" class="view" style="display:none">
+  <h2>Medicines</h2>
+
+  <form id="medForm">
+    <h3 id="formTitle">Add a medicine</h3>
+
+    <div class="row">
+      <label>Medicine name:<br>
+        <input type="text" id="medName" size="30" placeholder="e.g. Metformin">
+      </label>
+    </div>
+
+    <div class="row">
+      <label>Prescribed dosage:<br>
+        <input type="text" id="medDosage" size="30" placeholder="e.g. 500 mg, 1 tablet">
+      </label>
+    </div>
+
+    <div class="row">
+      <strong>Prescribed timings</strong> <span class="small">(add one or more times per day)</span><br>
+      <span id="presetBtns"></span><br>
+      Custom time: <input type="time" id="customTime">
+      <button type="button" id="addTimeBtn">Add time</button>
+      <div id="timeChips"></div>
+    </div>
+
+    <div class="row">
+      <label>Reminder schedule:
+        <select id="medType">
+          <option value="daily">Daily (every day)</option>
+          <option value="weekly">Weekly (choose days of the week)</option>
+          <option value="custom">Custom (every N days)</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="row" id="weeklyBox" style="display:none">
+      Days: <span id="dayBoxes"></span>
+    </div>
+
+    <div class="row" id="customBox" style="display:none">
+      Repeat every <input type="number" id="medInterval" min="1" value="2" style="width:60px"> day(s), counting from the start date
+    </div>
+
+    <div class="row">
+      <label>Start date: <input type="date" id="medStart"></label>
+      <label>End date (optional): <input type="date" id="medEnd"></label>
+    </div>
+
+    <div class="row">
+      <label><input type="checkbox" id="medReminder" checked> Reminders on for this medicine</label>
+    </div>
+
+    <button type="submit" id="saveMedBtn">Add medicine</button>
+    <button type="button" id="cancelEditBtn" style="display:none">Cancel editing</button>
+    <p id="medMsg"></p>
+  </form>
+
+  <h3>Saved medicines</h3>
+  <div id="medList"></div>
+</section>
+
+<!-- ===================== 3. REMINDERS ===================== -->
+<section id="view-reminders" class="view" style="display:none">
+  <h2>Reminders</h2>
+  <p class="page-tagline">Bhoolna nahi, Sehat se khelna nahi!</p>
+
+  <h3>Browser notifications</h3>
+  <div class="noticebox">
+    <p>Status: <strong id="notifStatus"></strong></p>
+    <button type="button" id="enableNotifBtn">Enable notifications</button>
+    <button type="button" id="testNotifBtn">Send a test notification</button>
+  </div>
+
+  <h3>Upcoming reminders (next 7 days)</h3>
+  <div id="upcomingList"></div>
+
+  <h3>Reminder settings per medicine</h3>
+  <p class="small">The reminder schedule (daily, weekly or custom) is set when you add or edit a medicine.
+    <button type="button" data-view="medicines">Go to Medicines</button></p>
+  <div id="reminderMedList"></div>
+
+  <h3>Notification limitations (please read)</h3>
+  <div class="noticebox">
+    <ul>
+      <li>Notifications only work <strong>while this page is open</strong> in a Chrome tab. If you close the tab or Chrome, no reminders will appear.</li>
+      <li>The page checks for due doses about every 30 seconds. Chrome may slow this down for background tabs, so a notification can arrive up to about a minute late.</li>
+      <li>You must click "Enable notifications" and choose Allow. If you chose Block, you have to re-allow it in Chrome's site settings.</li>
+      <li>Chrome may not allow notifications for pages opened directly from a file (the address starts with file://). If the test notification does not appear, open the folder in VS Code and use the "Live Server" extension, which opens the page at http://localhost.</li>
+      <li>Your operating system's "Do Not Disturb" / Focus mode can hide notifications.</li>
+      <li>This prototype does not send notifications to phones, does not work when the device is off, and does not send SMS or email.</li>
+      <li>Even without notification permission, a "Due now" box appears at the top of the page while it is open.</li>
+      <li>A notification is only sent for a dose that became due within the last 60 minutes and is still unmarked.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===================== 4. DOSE TRACKING ===================== -->
+<section id="view-today" class="view" style="display:none">
+  <h2>Dose Tracking</h2>
+  <div class="row">
+    Date: <input type="date" id="trackDate">
+    <button type="button" id="trackTodayBtn">Today</button>
+  </div>
+  <div id="todayList"></div>
+  <div class="noticebox">
+    <p class="small">"Pending" means a dose has not been marked yet. Each scheduled dose can have only one status; changing it replaces the old status (no duplicates). You cannot mark doses on future dates, and "Missed" can only be set once the scheduled time has passed.</p>
+    <button type="button" id="markOverdueBtn">Mark all overdue unmarked doses as Missed</button>
+    <p class="small">Overdue = more than 60 minutes past the scheduled time and still unmarked (this includes earlier days).</p>
+  </div>
+</section>
+
+<!-- ===================== 5. HISTORY ===================== -->
+<section id="view-history" class="view" style="display:none">
+  <h2>Medication History</h2>
+  <div class="row">
+    From: <input type="date" id="hFrom">
+    To: <input type="date" id="hTo">
+    Medicine: <select id="hMed"></select>
+    Status:
+    <select id="hStatus">
+      <option value="">All</option>
+      <option value="taken">Taken</option>
+      <option value="skipped">Skipped</option>
+      <option value="missed">Missed</option>
+    </select>
+    <button type="button" id="hClearBtn">Clear filters</button>
+  </div>
+  <div id="historyList"></div>
+</section>
+
+<!-- ===================== 6. WEEKLY REPORT ===================== -->
+<section id="view-report" class="view" style="display:none">
+  <h2>Weekly Medication Adherence Report</h2>
+  <div class="row noprint">
+    <button type="button" id="prevWeekBtn">&laquo; Previous week</button>
+    <button type="button" id="thisWeekBtn">This week</button>
+    <button type="button" id="nextWeekBtn">Next week &raquo;</button>
+    <button type="button" id="printBtn">Print / Save as PDF</button>
+  </div>
+  <div id="reportBody"></div>
+</section>
+
+<!-- ===================== 7. CAREGIVER ===================== -->
+<section id="view-caregiver" class="view" style="display:none">
+  <h2>Caregiver Dashboard</h2>
+  <div class="noticebox">
+    <strong>Prototype note:</strong> This is a read-only view of the data saved in this browser (use "Load sample data" on the Dashboard for a demo). There are no caregiver accounts and no remote access. In a real product, a caregiver would log in on their own device.
+  </div>
+  <div class="row">
+    Show doses for date: <input type="date" id="cgDate">
+    <button type="button" id="cgTodayBtn">Today</button>
+  </div>
+  <div id="caregiverBody"></div>
+</section>
+</main>
+</div>
+</div>
+
+<script>
+// =====================================================
+//  SETTINGS YOU CAN CHANGE EASILY
+// =====================================================
+// Change the project name here when you decide on one:
+var APP_NAME = "DAVA DOST";
+// Minutes after the scheduled time that a dose counts as "due now":
+var GRACE_MIN = 60;
+
+var KEYS = {
+  meds: "mrt_medicines",
+  records: "mrt_records",
+  notified: "mrt_notified",
+  settings: "mrt_settings"
+};
+var DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+var DAY_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+var PRESETS = [
+  { label: "Morning", time: "08:00" },
+  { label: "Afternoon", time: "14:00" },
+  { label: "Evening", time: "20:00" },
+  { label: "Night", time: "22:00" }
+];
+var VIEWS = ["dashboard", "medicines", "reminders", "today", "history", "report", "caregiver"];
+
+// =====================================================
+//  SAVING AND LOADING (LocalStorage)
+// =====================================================
+function loadData(key, fallback) {
+  try {
+    var raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
+function saveData(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (e) {
+    alert("Could not save data in this browser (LocalStorage may be blocked).");
+  }
+}
+
+// medicines: list of medicine objects
+// records: object. Key = one scheduled dose, value = its status record.
+//          Because the key is unique per dose, a dose can never have two records.
+var medicines = loadData(KEYS.meds, []);
+var records = loadData(KEYS.records, {});
+var notified = loadData(KEYS.notified, {});
+var settings = loadData(KEYS.settings, { patientName: "Patient" });
+if (!Array.isArray(medicines)) medicines = [];
+if (!records || typeof records !== "object" || Array.isArray(records)) records = {};
+if (!notified || typeof notified !== "object") notified = {};
+if (!settings || typeof settings !== "object") settings = { patientName: "Patient" };
+if (!settings.patientName) settings.patientName = "Patient";
+
+var currentView = "dashboard";
+var editingId = null;
+var formTimes = [];
+var reportOffset = 0; // 0 = this week, -1 = previous week, ...
+
+// =====================================================
+//  SMALL HELPER FUNCTIONS
+// =====================================================
+function $(id) { return document.getElementById(id); }
+function pad(n) { return String(n).padStart(2, "0"); }
+function dateStr(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+function parseDate(s) {
+  var p = s.split("-").map(Number);
+  return new Date(p[0], p[1] - 1, p[2]);
+}
+function todayStr() { return dateStr(new Date()); }
+function addDays(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+function daysBetween(a, b) {
+  return Math.round((Date.UTC(b.getFullYear(), b.getMonth(), b.getDate()) - Date.UTC(a.getFullYear(), a.getMonth(), a.getDate())) / 86400000);
+}
+function makeDT(ds, time) {
+  var p = ds.split("-").map(Number);
+  var t = time.split(":").map(Number);
+  return new Date(p[0], p[1] - 1, p[2], t[0], t[1]);
+}
+function fmtTime(t) {
+  var p = t.split(":").map(Number);
+  var ap = p[0] >= 12 ? "PM" : "AM";
+  var h = p[0] % 12 === 0 ? 12 : p[0] % 12;
+  return h + ":" + pad(p[1]) + " " + ap;
+}
+function fmtDate(ds) {
+  return parseDate(ds).toLocaleDateString(undefined, { weekday: "short", year: "numeric", month: "short", day: "numeric" });
+}
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function hashStr(s) {
+  var h = 0;
+  for (var i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) >>> 0; }
+  return h;
+}
+function timeUntil(dt) {
+  var mins = Math.round((dt - new Date()) / 60000);
+  if (mins < 1) return "now";
+  if (mins < 60) return "in " + mins + " min";
+  if (mins < 24 * 60) return "in " + Math.floor(mins / 60) + " h " + (mins % 60) + " min";
+  var days = Math.floor(mins / (24 * 60));
+  return "in " + days + " day" + (days === 1 ? "" : "s");
+}
+
+// =====================================================
+//  SCHEDULE LOGIC: which doses exist on which date?
+// =====================================================
+function isScheduledOn(med, d) {
+  var ds = dateStr(d);
+  if (ds < med.startDate) return false;
+  if (med.endDate && ds > med.endDate) return false;
+  if (med.scheduleType === "daily") return true;
+  if (med.scheduleType === "weekly") return med.days.indexOf(d.getDay()) !== -1;
+  if (med.scheduleType === "custom") {
+    var diff = daysBetween(parseDate(med.startDate), d);
+    return diff >= 0 && diff % med.interval === 0;
+  }
+  return false;
+}
+
+// Returns every scheduled dose for one date (with its current status).
+// Also includes saved records for that date that no longer match the
+// schedule (for example if a medicine was deleted or its times were edited),
+// so history and statistics are never lost.
+function dosesForDate(d) {
+  var ds = dateStr(d);
+  var list = [];
+  var seen = {};
+  medicines.forEach(function (med) {
+    if (!isScheduledOn(med, d)) return;
+    med.times.forEach(function (time) {
+      var key = med.id + "|" + ds + "|" + time;
+      if (seen[key]) return;
+      seen[key] = true;
+      var rec = records[key];
+      list.push({
+        key: key, medId: med.id, name: med.name, dosage: med.dosage,
+        date: ds, time: time, dt: makeDT(ds, time),
+        status: rec ? rec.status : "pending",
+        reminderOn: !!med.reminderOn,
+        markedAt: rec ? rec.markedAt : null
+      });
+    });
+  });
+  Object.keys(records).forEach(function (key) {
+    var r = records[key];
+    if (r.date === ds && !seen[key]) {
+      seen[key] = true;
+      list.push({
+        key: key, medId: r.medId, name: r.name, dosage: r.dosage,
+        date: ds, time: r.time, dt: makeDT(ds, r.time),
+        status: r.status, reminderOn: false, markedAt: r.markedAt, orphan: true
+      });
+    }
+  });
+  list.sort(function (a, b) { return (a.dt - b.dt) || a.name.localeCompare(b.name); });
+  return list;
+}
+
+// A dose counts in the statistics once its time has arrived, or if it was already marked.
+function isDue(dose, now) {
+  return dose.status !== "pending" || dose.dt <= now;
+}
+
+function computeStats(doses, now) {
+  var s = { total: 0, taken: 0, skipped: 0, missed: 0, pending: 0, upcoming: 0, percent: null };
+  doses.forEach(function (d) {
+    if (!isDue(d, now)) { s.upcoming++; return; }
+    s.total++;
+    if (d.status === "taken") s.taken++;
+    else if (d.status === "skipped") s.skipped++;
+    else if (d.status === "missed") s.missed++;
+    else s.pending++;
+  });
+  if (s.total > 0) s.percent = Math.round((s.taken / s.total) * 1000) / 10;
+  return s;
+}
+
+function sumStats(list) {
+  var s = { total: 0, taken: 0, skipped: 0, missed: 0, pending: 0, upcoming: 0, percent: null };
+  list.forEach(function (x) {
+    s.total += x.total; s.taken += x.taken; s.skipped += x.skipped;
+    s.missed += x.missed; s.pending += x.pending; s.upcoming += x.upcoming;
+  });
+  if (s.total > 0) s.percent = Math.round((s.taken / s.total) * 1000) / 10;
+  return s;
+}
+
+// Statistics for a range of dates (startStr and endStr are "YYYY-MM-DD").
+function computeRange(startStr, endStr, now) {
+  var days = [];
+  for (var d = parseDate(startStr); dateStr(d) <= endStr; d = addDays(d, 1)) {
+    days.push({ date: dateStr(d), stats: computeStats(dosesForDate(d), now) });
+  }
+  return { days: days, stats: sumStats(days.map(function (x) { return x.stats; })) };
+}
+
+function earliestStart() {
+  var min = todayStr();
+  medicines.forEach(function (m) { if (m.startDate < min) min = m.startDate; });
+  Object.keys(records).forEach(function (k) { if (records[k].date < min) min = records[k].date; });
+  return min;
+}
+
+function overallStats() {
+  return computeRange(earliestStart(), todayStr(), new Date()).stats;
+}
+
+function pctText(p) { return p === null ? "No data yet" : p + "%"; }
+
+function dueNowDoses(now) {
+  var all = dosesForDate(addDays(now, -1)).concat(dosesForDate(now));
+  return all.filter(function (d) {
+    var mins = (now - d.dt) / 60000;
+    return d.status === "pending" && d.reminderOn && mins >= 0 && mins <= GRACE_MIN;
+  });
+}
+
+function getUpcoming(limit, days) {
+  var now = new Date();
+  var out = [];
+  for (var i = 0; i <= days; i++) {
+    dosesForDate(addDays(now, i)).forEach(function (d) {
+      if (d.status === "pending" && d.reminderOn && d.dt > now) out.push(d);
+    });
+  }
+  out.sort(function (a, b) { return a.dt - b.dt; });
+  return out.slice(0, limit);
+}
+
+function scheduleText(med) {
+  var t;
+  if (med.scheduleType === "daily") t = "Every day";
+  else if (med.scheduleType === "weekly") t = "Weekly on " + med.days.map(function (i) { return DAY_SHORT[i]; }).join(", ");
+  else t = "Every " + med.interval + " day(s)";
+  t += " from " + med.startDate;
+  if (med.endDate) t += " to " + med.endDate;
+  return t;
+}
+
+// =====================================================
+//  DOSE STATUS ACTIONS
+// =====================================================
+function makeRecord(dose, status) {
+  return {
+    key: dose.key, medId: dose.medId, name: dose.name, dosage: dose.dosage,
+    date: dose.date, time: dose.time, status: status, markedAt: new Date().toISOString()
+  };
+}
+
+function setStatus(key, status) {
+  var parts = key.split("|");
+  var dose = dosesForDate(parseDate(parts[1])).filter(function (d) { return d.key === key; })[0];
+  if (!dose) { alert("This dose could not be found."); return; }
+  if (dose.date > todayStr()) { alert("You cannot mark a dose on a future date."); return; }
+  if (status === "missed" && dose.dt > new Date()) { alert("A dose can only be marked Missed after its scheduled time."); return; }
+  if (records[key] && records[key].status === status) return; // already has this status: no duplicate
+  records[key] = makeRecord(dose, status); // one record per dose key
+  saveData(KEYS.records, records);
+  renderAll();
+}
+
+function resetDose(key) {
+  delete records[key];
+  saveData(KEYS.records, records);
+  renderAll();
+}
+
+function markOverdueMissed() {
+  var now = new Date();
+  var todayD = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var toMark = [];
+  for (var d = parseDate(earliestStart()); d <= todayD; d = addDays(d, 1)) {
+    dosesForDate(d).forEach(function (x) {
+      if (x.status === "pending" && (now - x.dt) / 60000 > GRACE_MIN) toMark.push(x);
+    });
+  }
+  if (toMark.length === 0) { alert("There are no overdue unmarked doses."); return; }
+  if (!confirm("Mark " + toMark.length + " overdue unmarked dose(s) as Missed?")) return;
+  toMark.forEach(function (x) { records[x.key] = makeRecord(x, "missed"); });
+  saveData(KEYS.records, records);
+  renderAll();
+}
+
+function statusLabel(d, now) {
+  if (d.status === "taken") return "Taken";
+  if (d.status === "skipped") return "Skipped";
+  if (d.status === "missed") return "Missed";
+  if (d.dt > now) return "Pending (upcoming)";
+  if ((now - d.dt) / 60000 <= GRACE_MIN) return "Pending (due now)";
+  return "Pending (overdue, not marked)";
+}
+function statusClass(d, now) {
+  if (d.status !== "pending") return "st-" + d.status;
+  if (d.dt > now) return "st-pending";
+  if ((now - d.dt) / 60000 <= GRACE_MIN) return "st-due";
+  return "st-overdue";
+}
+
+// =====================================================
+//  REUSABLE HTML BUILDERS
+// =====================================================
+function statusButton(d, status, label, disabled) {
+  var already = d.status === status;
+  return '<button data-action="status" data-key="' + esc(d.key) + '" data-status="' + status + '"' +
+    ((disabled || already) ? " disabled" : "") + ">" + label + "</button>";
+}
+
+function doseTable(doses, editable) {
+  if (doses.length === 0) return "<p>No doses scheduled for this day.</p>";
+  var now = new Date();
+  var today = todayStr();
+  var h = "<table><tr><th>Time</th><th>Medicine</th><th>Dosage</th><th>Status</th>" + (editable ? "<th>Mark as</th>" : "") + "</tr>";
+  doses.forEach(function (d) {
+    h += "<tr><td>" + fmtTime(d.time) + "</td><td>" + esc(d.name) + "</td><td>" + esc(d.dosage) +
+      '</td><td class="' + statusClass(d, now) + '">' + statusLabel(d, now) + "</td>";
+    if (editable) {
+      var future = d.date > today;
+      h += "<td>" + statusButton(d, "taken", "Taken", future) + statusButton(d, "skipped", "Skipped", future) +
+        statusButton(d, "missed", "Missed", future || d.dt > now);
+      if (d.status !== "pending") h += '<button data-action="reset" data-key="' + esc(d.key) + '">Undo</button>';
+      h += "</td>";
+    }
+    h += "</tr>";
+  });
+  return h + "</table>";
+}
+
+function upcomingTable(list) {
+  if (list.length === 0) return "<p>No upcoming reminders. Add a medicine with reminders turned on.</p>";
+  var h = "<table><tr><th>Date</th><th>Time</th><th>Medicine</th><th>Dosage</th><th>When</th></tr>";
+  list.forEach(function (d) {
+    h += "<tr><td>" + fmtDate(d.date) + "</td><td>" + fmtTime(d.time) + "</td><td>" + esc(d.name) +
+      "</td><td>" + esc(d.dosage) + "</td><td>" + timeUntil(d.dt) + "</td></tr>";
+  });
+  return h + "</table>";
+}
+
+function medsTable(withActions) {
+  if (medicines.length === 0) return "<p>No medicines added yet.</p>";
+  var h = "<table><tr><th>Medicine</th><th>Dosage</th><th>Times</th><th>Schedule</th><th>Reminders</th>" + (withActions ? "<th>Actions</th>" : "") + "</tr>";
+  medicines.forEach(function (m) {
+    h += "<tr><td>" + esc(m.name) + "</td><td>" + esc(m.dosage) + "</td><td>" +
+      m.times.map(fmtTime).join(", ") + "</td><td>" + scheduleText(m) + "</td><td>" + (m.reminderOn ? "On" : "Off") + "</td>";
+    if (withActions) {
+      h += '<td><button data-action="editMed" data-id="' + esc(m.id) + '">Edit</button>' +
+        '<button data-action="deleteMed" data-id="' + esc(m.id) + '">Delete</button></td>';
+    }
+    h += "</tr>";
+  });
+  return h + "</table>";
+}
+
+// =====================================================
+//  RENDERING THE SECTIONS
+// =====================================================
+function renderBanner() {
+  var due = dueNowDoses(new Date());
+  if (due.length === 0) { $("banner").innerHTML = ""; return; }
+  var h = '<div class="alertbox"><strong>Due now:</strong><table>';
+  due.forEach(function (d) {
+    h += "<tr><td>" + esc(d.name) + " (" + esc(d.dosage) + ")</td><td>Scheduled " + fmtTime(d.time) + "</td><td>" +
+      statusButton(d, "taken", "Taken", false) + statusButton(d, "skipped", "Skipped", false) + "</td></tr>";
+  });
+  $("banner").innerHTML = h + "</table></div>";
+}
+
+function renderDashboard() {
+  var now = new Date();
+  var todayDoses = dosesForDate(now);
+  var takenToday = todayDoses.filter(function (d) { return d.status === "taken"; }).length;
+  var overall = overallStats();
+  var upcomingCount = getUpcoming(100, 7).length;
+  var two = function (n) { return n < 10 ? "0" + n : String(n); };
+  var h = '<div class="cards">' +
+    '<div class="card"><div class="small">Medicines</div><div class="big">' + two(medicines.length) + "</div></div>" +
+    '<div class="card"><div class="small">Doses today</div><div class="big">' + two(takenToday) + " / " + two(todayDoses.length) + '</div><div class="small">taken</div></div>' +
+    '<div class="card"><div class="small">Adherence</div><div class="big">' + pctText(overall.percent) + '</div><div class="small">' + overall.taken + " taken of " + overall.total + " due doses</div></div>" +
+    '<div class="card"><div class="small">Upcoming</div><div class="big">' + two(upcomingCount) + '</div><div class="small">next 7 days</div></div>' +
+    "</div>";
+
+  h += "<h3>Today's adherence progress</h3>";
+  if (todayDoses.length === 0) {
+    h += "<p>No doses scheduled today.</p>";
+  } else {
+    h += '<progress value="' + takenToday + '" max="' + todayDoses.length + '"></progress>' +
+      "<p>" + takenToday + " of " + todayDoses.length + " doses taken today.</p>";
+  }
+
+  h += "<h3>Today's schedule (" + fmtDate(dateStr(now)) + ")</h3>" + doseTable(todayDoses, true);
+  h += "<h3>Upcoming reminders</h3>" + upcomingTable(getUpcoming(5, 7));
+  h += '<p class="small">Notifications: ' + notifStatusText() + "</p>";
+  $("dashBody").innerHTML = h;
+}
+
+function renderMedicines() {
+  $("medList").innerHTML = medsTable(true);
+}
+
+function renderReminders() {
+  $("notifStatus").textContent = notifStatusText();
+  $("upcomingList").innerHTML = upcomingTable(getUpcoming(20, 7));
+  if (medicines.length === 0) { $("reminderMedList").innerHTML = "<p>No medicines added yet.</p>"; return; }
+  var h = "<table><tr><th>Medicine</th><th>Times</th><th>Schedule</th><th>Reminders</th><th></th></tr>";
+  medicines.forEach(function (m) {
+    h += "<tr><td>" + esc(m.name) + "</td><td>" + m.times.map(fmtTime).join(", ") + "</td><td>" + scheduleText(m) +
+      "</td><td>" + (m.reminderOn ? "On" : "Off") + '</td><td><button data-action="toggleReminder" data-id="' + esc(m.id) + '">' +
+      (m.reminderOn ? "Turn off" : "Turn on") + "</button></td></tr>";
+  });
+  $("reminderMedList").innerHTML = h + "</table>";
+}
+
+function renderToday() {
+  var ds = $("trackDate").value || todayStr();
+  var doses = dosesForDate(parseDate(ds));
+  var s = computeStats(doses, new Date());
+  var h = "<h3>" + fmtDate(ds) + "</h3>" + doseTable(doses, true);
+  h += "<p>Taken: " + s.taken + " | Skipped: " + s.skipped + " | Missed: " + s.missed + " | Pending: " + (s.pending + s.upcoming) +
+    " | Adherence for this day (due doses): " + pctText(s.percent) + "</p>";
+  $("todayList").innerHTML = h;
+}
+
+function renderHistory() {
+  var names = [];
+  Object.keys(records).forEach(function (k) {
+    if (names.indexOf(records[k].name) === -1) names.push(records[k].name);
+  });
+  names.sort();
+  var sel = $("hMed");
+  var cur = sel.value;
+  var opts = '<option value="">All medicines</option>';
+  names.forEach(function (n) { opts += '<option value="' + esc(n) + '">' + esc(n) + "</option>"; });
+  sel.innerHTML = opts;
+  if (names.indexOf(cur) !== -1) sel.value = cur;
+
+  var from = $("hFrom").value, to = $("hTo").value, st = $("hStatus").value, med = sel.value;
+  var all = Object.keys(records).map(function (k) { return records[k]; });
+  var list = all.filter(function (r) {
+    if (from && r.date < from) return false;
+    if (to && r.date > to) return false;
+    if (st && r.status !== st) return false;
+    if (med && r.name !== med) return false;
+    return true;
+  });
+  list.sort(function (a, b) {
+    if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+    if (a.time !== b.time) return a.time < b.time ? 1 : -1;
+    return 0;
+  });
+  var h = "<p>Showing " + list.length + " of " + all.length + " records.</p>";
+  if (list.length === 0) {
+    h += "<p>No history records match. Mark doses as Taken, Skipped or Missed in Dose Tracking and they will appear here.</p>";
+  } else {
+    h += "<table><tr><th>Date</th><th>Scheduled time</th><th>Medicine</th><th>Dosage</th><th>Status</th><th>Marked at</th></tr>";
+    list.forEach(function (r) {
+      h += "<tr><td>" + fmtDate(r.date) + "</td><td>" + fmtTime(r.time) + "</td><td>" + esc(r.name) + "</td><td>" + esc(r.dosage) +
+        '</td><td class="st-' + r.status + '">' + r.status.charAt(0).toUpperCase() + r.status.slice(1) + "</td><td>" +
+        new Date(r.markedAt).toLocaleString() + "</td></tr>";
+    });
+    h += "</table>";
+  }
+  h += '<p class="small">History lists doses that were marked. Doses that were never marked are not records; use "Mark all overdue unmarked doses as Missed" in Dose Tracking to turn them into Missed records.</p>';
+  $("historyList").innerHTML = h;
+}
+
+function barRow(label, count, total, cls) {
+  var pct = total > 0 ? (count / total) * 100 : 0;
+  return "<tr><td>" + label + '</td><td style="width:55%"><div class="barbg"><div class="bar ' + cls + '" style="width:' + pct.toFixed(1) +
+    '%"></div></div></td><td>' + count + " (" + pct.toFixed(1) + "%)</td></tr>";
+}
+
+function renderReport() {
+  var now = new Date();
+  var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var dow = (today.getDay() + 6) % 7; // Monday = 0
+  var start = addDays(today, -dow + reportOffset * 7);
+  var end = addDays(start, 6);
+  var range = computeRange(dateStr(start), dateStr(end), now);
+  var s = range.stats;
+
+  var title = reportOffset === 0 ? "This week" : (reportOffset === -1 ? "Previous week" : Math.abs(reportOffset) + " weeks ago");
+  var h = "<h3>" + title + ": " + fmtDate(dateStr(start)) + " to " + fmtDate(dateStr(end)) + "</h3>";
+  h += '<div class="cards">' +
+    '<div class="card"><div class="small">Total scheduled doses</div><div class="big">' + s.total + "</div></div>" +
+    '<div class="card"><div class="small">Taken</div><div class="big">' + s.taken + "</div></div>" +
+    '<div class="card"><div class="small">Skipped</div><div class="big">' + s.skipped + "</div></div>" +
+    '<div class="card"><div class="small">Missed</div><div class="big">' + s.missed + "</div></div>" +
+    '<div class="card"><div class="small">Adherence</div><div class="big">' + pctText(s.percent) + "</div></div>" +
+    "</div>";
+  h += '<p class="small">Adherence % = Taken / Total scheduled doses x 100. Total scheduled counts doses whose time has already arrived (or that were already marked). ' +
+    "Unmarked doses count in the total, so they lower adherence. Pending (unmarked): " + s.pending +
+    (s.upcoming > 0 ? ". Doses later this week, not yet due: " + s.upcoming : "") + ".</p>";
+
+  h += "<h3>Chart</h3>";
+  if (s.total === 0) {
+    h += "<p>No scheduled doses were due in this week.</p>";
+  } else {
+    h += "<table>" + barRow("Taken", s.taken, s.total, "bar-taken") + barRow("Skipped", s.skipped, s.total, "bar-skipped") +
+      barRow("Missed", s.missed, s.total, "bar-missed") + barRow("Pending (unmarked)", s.pending, s.total, "bar-pending") + "</table>";
+  }
+
+  h += "<h3>Day by day</h3><table><tr><th>Day</th><th>Scheduled</th><th>Taken</th><th>Skipped</th><th>Missed</th><th>Pending</th><th>Adherence</th></tr>";
+  range.days.forEach(function (d) {
+    var x = d.stats;
+    h += "<tr><td>" + fmtDate(d.date) + "</td><td>" + x.total + "</td><td>" + x.taken + "</td><td>" + x.skipped +
+      "</td><td>" + x.missed + "</td><td>" + x.pending + "</td><td>" + pctText(x.percent) + "</td></tr>";
+  });
+  h += "</table>";
+  $("reportBody").innerHTML = h;
+  $("nextWeekBtn").disabled = reportOffset >= 0;
+}
+
+function renderCaregiver() {
+  var now = new Date();
+  var overall = overallStats();
+  var last7 = computeRange(dateStr(addDays(now, -6)), todayStr(), now).stats;
+
+  var alerts = [];
+  for (var i = 6; i >= 0; i--) {
+    dosesForDate(addDays(now, -i)).forEach(function (d) {
+      if (d.status === "missed" || (d.status === "pending" && (now - d.dt) / 60000 > GRACE_MIN)) alerts.push(d);
+    });
+  }
+
+  var sel = $("cgDate").value || todayStr();
+  var selDoses = dosesForDate(parseDate(sel));
+  var ss = computeStats(selDoses, now);
+
+  var h = "<p><strong>Patient:</strong> " + esc(settings.patientName) + "</p>";
+  h += '<div class="cards">' +
+    '<div class="card"><div class="small">Overall adherence</div><div class="big">' + pctText(overall.percent) + '</div><div class="small">' + overall.taken + " taken of " + overall.total + " due</div></div>" +
+    '<div class="card"><div class="small">Last 7 days</div><div class="big">' + pctText(last7.percent) + '</div><div class="small">' + last7.taken + " taken, " + last7.skipped + " skipped, " + last7.missed + " missed</div></div>" +
+    '<div class="card"><div class="small">Total medicines</div><div class="big">' + medicines.length + "</div></div>" +
+    "</div>";
+
+  h += "<h3>Doses on " + fmtDate(sel) + "</h3>" + doseTable(selDoses, false);
+  h += "<p>Taken: " + ss.taken + " | Skipped: " + ss.skipped + " | Missed: " + ss.missed + " | Pending: " + (ss.pending + ss.upcoming) + "</p>";
+
+  h += "<h3>Attention needed (last 7 days)</h3>";
+  if (alerts.length === 0) {
+    h += "<p>No missed or overdue doses in the last 7 days.</p>";
+  } else {
+    h += "<table><tr><th>Date</th><th>Time</th><th>Medicine</th><th>Dosage</th><th>Status</th></tr>";
+    alerts.forEach(function (d) {
+      h += "<tr><td>" + fmtDate(d.date) + "</td><td>" + fmtTime(d.time) + "</td><td>" + esc(d.name) + "</td><td>" + esc(d.dosage) +
+        '</td><td class="' + statusClass(d, now) + '">' + statusLabel(d, now) + "</td></tr>";
+    });
+    h += "</table>";
+  }
+
+  h += "<h3>Medicines scheduled for the patient</h3>" + medsTable(false);
+  $("caregiverBody").innerHTML = h;
+}
+
+function renderCurrent() {
+  if (currentView === "dashboard") renderDashboard();
+  else if (currentView === "medicines") renderMedicines();
+  else if (currentView === "reminders") renderReminders();
+  else if (currentView === "today") renderToday();
+  else if (currentView === "history") renderHistory();
+  else if (currentView === "report") renderReport();
+  else if (currentView === "caregiver") renderCaregiver();
+}
+
+function renderAll() {
+  renderBanner();
+  renderCurrent();
+}
+
+function setView(name) {
+  currentView = name;
+  VIEWS.forEach(function (v) { $("view-" + v).style.display = (v === name) ? "block" : "none"; });
+  var buttons = document.querySelectorAll("#nav button");
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].classList.toggle("active", buttons[i].getAttribute("data-view") === name);
+  }
+  renderCurrent();
+  window.scrollTo(0, 0);
+}
+
+// =====================================================
+//  MEDICINE FORM (add / edit / delete)
+// =====================================================
+function showMedMsg(text, isError) {
+  var el = $("medMsg");
+  el.textContent = text;
+  el.className = isError ? "msg-error" : "msg-ok";
+}
+
+function renderTimeChips() {
+  var box = $("timeChips");
+  if (formTimes.length === 0) { box.innerHTML = '<span class="small">No times added yet.</span>'; return; }
+  box.innerHTML = formTimes.map(function (t) {
+    return '<span class="chip">' + fmtTime(t) + ' <button type="button" class="rmTime" data-time="' + t + '">x</button></span>';
+  }).join("");
+}
+
+function addFormTime(t) {
+  if (!/^\d{2}:\d{2}$/.test(t || "")) { showMedMsg("Please choose a valid time first.", true); return; }
+  if (formTimes.indexOf(t) === -1) formTimes.push(t);
+  formTimes.sort();
+  showMedMsg("", false);
+  renderTimeChips();
+}
+
+function toggleScheduleBoxes() {
+  var type = $("medType").value;
+  $("weeklyBox").style.display = type === "weekly" ? "block" : "none";
+  $("customBox").style.display = type === "custom" ? "block" : "none";
+}
+
+function resetForm() {
+  editingId = null;
+  formTimes = [];
+  $("medName").value = "";
+  $("medDosage").value = "";
+  $("customTime").value = "";
+  $("medType").value = "daily";
+  $("medInterval").value = "2";
+  $("medStart").value = todayStr();
+  $("medEnd").value = "";
+  $("medReminder").checked = true;
+  for (var i = 0; i < 7; i++) $("day" + i).checked = false;
+  $("formTitle").textContent = "Add a medicine";
+  $("saveMedBtn").textContent = "Add medicine";
+  $("cancelEditBtn").style.display = "none";
+  toggleScheduleBoxes();
+  renderTimeChips();
+}
+
+function onSaveMedicine(e) {
+  e.preventDefault();
+  var name = $("medName").value.trim();
+  var dosage = $("medDosage").value.trim();
+  var type = $("medType").value;
+  var startDate = $("medStart").value || todayStr();
+  var endDate = $("medEnd").value || "";
+  var days = [];
+  var interval = 1;
+
+  if (!name) { showMedMsg("Please enter the medicine name.", true); return; }
+  if (!dosage) { showMedMsg("Please enter the prescribed dosage.", true); return; }
+  if (formTimes.length === 0) { showMedMsg("Please add at least one timing.", true); return; }
+  if (type === "weekly") {
+    for (var i = 0; i < 7; i++) { if ($("day" + i).checked) days.push(i); }
+    if (days.length === 0) { showMedMsg("Please choose at least one day of the week.", true); return; }
+  }
+  if (type === "custom") {
+    interval = parseInt($("medInterval").value, 10);
+    if (!(interval >= 1)) { showMedMsg("Please enter a repeat interval of 1 or more days.", true); return; }
+  }
+  if (endDate && endDate < startDate) { showMedMsg("The end date cannot be before the start date.", true); return; }
+
+  var med = {
+    id: editingId || ("m" + Date.now() + Math.floor(Math.random() * 1000)),
+    name: name, dosage: dosage, times: formTimes.slice(),
+    scheduleType: type, days: days, interval: interval,
+    startDate: startDate, endDate: endDate, reminderOn: $("medReminder").checked
+  };
+
+  var wasEditing = !!editingId;
+  if (wasEditing) {
+    medicines = medicines.map(function (m) { return m.id === editingId ? med : m; });
+  } else {
+    medicines.push(med);
+  }
+  saveData(KEYS.meds, medicines);
+  resetForm();
+  showMedMsg(wasEditing ? "Medicine updated and saved." : "Medicine added and saved.", false);
+  renderAll();
+}
+
+function editMedicine(id) {
+  var med = medicines.filter(function (m) { return m.id === id; })[0];
+  if (!med) return;
+  editingId = id;
+  formTimes = med.times.slice();
+  $("medName").value = med.name;
+  $("medDosage").value = med.dosage;
+  $("medType").value = med.scheduleType;
+  $("medInterval").value = med.interval || 2;
+  $("medStart").value = med.startDate;
+  $("medEnd").value = med.endDate || "";
+  $("medReminder").checked = !!med.reminderOn;
+  for (var i = 0; i < 7; i++) $("day" + i).checked = med.days.indexOf(i) !== -1;
+  $("formTitle").textContent = "Edit medicine";
+  $("saveMedBtn").textContent = "Save changes";
+  $("cancelEditBtn").style.display = "inline-block";
+  showMedMsg("", false);
+  toggleScheduleBoxes();
+  renderTimeChips();
+  $("medForm").scrollIntoView();
+}
+
+function deleteMedicine(id) {
+  var med = medicines.filter(function (m) { return m.id === id; })[0];
+  if (!med) return;
+  if (!confirm('Delete "' + med.name + '"? Its past history records will be kept.')) return;
+  medicines = medicines.filter(function (m) { return m.id !== id; });
+  saveData(KEYS.meds, medicines);
+  if (editingId === id) resetForm();
+  showMedMsg("Medicine deleted.", false);
+  renderAll();
+}
+
+function toggleReminder(id) {
+  medicines.forEach(function (m) { if (m.id === id) m.reminderOn = !m.reminderOn; });
+  saveData(KEYS.meds, medicines);
+  renderAll();
+}
+
+// =====================================================
+//  NOTIFICATIONS
+// =====================================================
+function notifStatusText() {
+  if (!("Notification" in window)) return "Not supported by this browser.";
+  var p = Notification.permission;
+  if (p === "granted") return "Enabled (permission granted).";
+  if (p === "denied") return "Blocked. Allow notifications for this site in Chrome's site settings.";
+  return "Not enabled yet. Click \"Enable notifications\" and choose Allow.";
+}
+
+function enableNotifications() {
+  if (!("Notification" in window)) { alert("This browser does not support notifications."); return; }
+  try {
+    var result = Notification.requestPermission();
+    if (result && result.then) { result.then(function () { renderAll(); }); }
+    else { setTimeout(renderAll, 500); }
+  } catch (e) {
+    alert("Could not ask for notification permission here. Try opening the page with the VS Code Live Server extension.");
+  }
+}
+
+function showNotification(title, body) {
+  if (!("Notification" in window) || Notification.permission !== "granted") return false;
+  try {
+    new Notification(title, { body: body });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function testNotification() {
+  if (!("Notification" in window)) { alert("This browser does not support notifications."); return; }
+  if (Notification.permission !== "granted") { alert("Notifications are not enabled yet. Click \"Enable notifications\" first and choose Allow."); return; }
+  if (!showNotification("Test reminder", "If you can see this, notifications work.")) {
+    alert("The notification could not be shown in this setup. Try opening the page with the VS Code Live Server extension.");
+  }
+}
+
+function checkReminders() {
+  var changed = false;
+  dueNowDoses(new Date()).forEach(function (d) {
+    if (!notified[d.key]) {
+      notified[d.key] = true;
+      changed = true;
+      showNotification("Time to take " + d.name, d.dosage + " (scheduled " + fmtTime(d.time) + ")");
+    }
+  });
+  if (changed) saveData(KEYS.notified, notified);
+}
+
+function tick() {
+  checkReminders();
+  renderBanner();
+  if (currentView === "dashboard" || currentView === "reminders" || currentView === "today" || currentView === "caregiver") {
+    renderCurrent();
+  }
+}
+
+// =====================================================
+//  SAMPLE DATA AND CLEARING DATA
+// =====================================================
+function loadSampleData() {
+  if (!confirm("This will replace all current data with sample data. Continue?")) return;
+  var now = new Date();
+  var t0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var start = dateStr(addDays(t0, -13));
+  medicines = [
+    { id: "sample1", name: "Metformin", dosage: "500 mg, 1 tablet", times: ["08:00", "20:00"], scheduleType: "daily", days: [], interval: 1, startDate: start, endDate: "", reminderOn: true },
+    { id: "sample2", name: "Amlodipine", dosage: "5 mg, 1 tablet", times: ["09:00"], scheduleType: "daily", days: [], interval: 1, startDate: start, endDate: "", reminderOn: true },
+    { id: "sample3", name: "Vitamin D3", dosage: "60000 IU, 1 sachet", times: ["10:00"], scheduleType: "weekly", days: [0], interval: 1, startDate: start, endDate: "", reminderOn: true },
+    { id: "sample4", name: "Iron supplement", dosage: "1 tablet", times: ["13:00"], scheduleType: "custom", days: [], interval: 2, startDate: start, endDate: "", reminderOn: true }
+  ];
+  records = {};
+  notified = {};
+  settings.patientName = "Sample Patient";
+  // Create example history for the previous 13 days (about 72% taken, 12% skipped, 12% missed, 4% unmarked).
+  for (var i = 13; i >= 1; i--) {
+    dosesForDate(addDays(t0, -i)).forEach(function (dose) {
+      var n = hashStr(dose.key) % 100;
+      var st = null;
+      if (n < 72) st = "taken";
+      else if (n < 84) st = "skipped";
+      else if (n < 96) st = "missed";
+      if (st) {
+        var r = makeRecord(dose, st);
+        r.markedAt = dose.dt.toISOString();
+        records[dose.key] = r;
+      }
+    });
+  }
+  saveData(KEYS.meds, medicines);
+  saveData(KEYS.records, records);
+  saveData(KEYS.notified, notified);
+  saveData(KEYS.settings, settings);
+  $("patientNameInput").value = settings.patientName;
+  $("patientLine").textContent = "Patient: " + settings.patientName;
+  resetForm();
+  renderAll();
+}
+
+function clearAllData() {
+  if (!confirm("Delete ALL medicines, records and settings saved in this browser? This cannot be undone.")) return;
+  Object.keys(KEYS).forEach(function (k) {
+    try { localStorage.removeItem(KEYS[k]); } catch (e) {}
+  });
+  medicines = [];
+  records = {};
+  notified = {};
+  settings = { patientName: "Patient" };
+  $("patientNameInput").value = settings.patientName;
+  $("patientLine").textContent = "Patient: " + settings.patientName;
+  resetForm();
+  renderAll();
+}
+
+function savePatientName() {
+  var n = $("patientNameInput").value.trim();
+  settings.patientName = n || "Patient";
+  saveData(KEYS.settings, settings);
+  $("patientNameInput").value = settings.patientName;
+  $("patientLine").textContent = "Patient: " + settings.patientName;
+  renderAll();
+}
+
+// =====================================================
+//  STARTING THE APP
+// =====================================================
+function init() {
+  document.title = APP_NAME;
+  $("appTitle").textContent = APP_NAME;
+  $("patientLine").textContent = "Patient: " + settings.patientName;
+  $("patientNameInput").value = settings.patientName;
+
+  // preset timing buttons and weekday checkboxes
+  $("presetBtns").innerHTML = PRESETS.map(function (p) {
+    return '<button type="button" class="preset" data-time="' + p.time + '">' + p.label + " (" + fmtTime(p.time) + ")</button>";
+  }).join("");
+  var dayHtml = "";
+  for (var i = 0; i < 7; i++) {
+    dayHtml += '<label style="margin-right:10px"><input type="checkbox" id="day' + i + '"> ' + DAY_SHORT[i] + "</label>";
+  }
+  $("dayBoxes").innerHTML = dayHtml;
+
+  // default dates
+  $("trackDate").value = todayStr();
+  $("cgDate").value = todayStr();
+  resetForm();
+
+  // events
+  document.addEventListener("click", function (e) {
+    var el = e.target.closest("[data-action],[data-view]");
+    if (!el || el.disabled) return;
+    if (el.getAttribute("data-view")) { setView(el.getAttribute("data-view")); return; }
+    var a = el.getAttribute("data-action");
+    if (a === "status") setStatus(el.getAttribute("data-key"), el.getAttribute("data-status"));
+    else if (a === "reset") resetDose(el.getAttribute("data-key"));
+    else if (a === "editMed") editMedicine(el.getAttribute("data-id"));
+    else if (a === "deleteMed") deleteMedicine(el.getAttribute("data-id"));
+    else if (a === "toggleReminder") toggleReminder(el.getAttribute("data-id"));
+  });
+
+  $("presetBtns").addEventListener("click", function (e) {
+    var b = e.target.closest(".preset");
+    if (b) addFormTime(b.getAttribute("data-time"));
+  });
+  $("timeChips").addEventListener("click", function (e) {
+    var b = e.target.closest(".rmTime");
+    if (b) {
+      var t = b.getAttribute("data-time");
+      formTimes = formTimes.filter(function (x) { return x !== t; });
+      renderTimeChips();
+    }
+  });
+  $("addTimeBtn").addEventListener("click", function () { addFormTime($("customTime").value); $("customTime").value = ""; });
+  $("medType").addEventListener("change", toggleScheduleBoxes);
+  $("medForm").addEventListener("submit", onSaveMedicine);
+  $("cancelEditBtn").addEventListener("click", function () { resetForm(); showMedMsg("Editing cancelled.", false); });
+
+  $("enableNotifBtn").addEventListener("click", enableNotifications);
+  $("testNotifBtn").addEventListener("click", testNotification);
+
+  $("trackDate").addEventListener("change", renderToday);
+  $("trackTodayBtn").addEventListener("click", function () { $("trackDate").value = todayStr(); renderToday(); });
+  $("markOverdueBtn").addEventListener("click", markOverdueMissed);
+
+  ["hFrom", "hTo", "hMed", "hStatus"].forEach(function (id) { $(id).addEventListener("change", renderHistory); });
+  $("hClearBtn").addEventListener("click", function () {
+    $("hFrom").value = ""; $("hTo").value = ""; $("hMed").value = ""; $("hStatus").value = "";
+    renderHistory();
+  });
+
+  $("prevWeekBtn").addEventListener("click", function () { reportOffset--; renderReport(); });
+  $("nextWeekBtn").addEventListener("click", function () { if (reportOffset < 0) { reportOffset++; renderReport(); } });
+  $("thisWeekBtn").addEventListener("click", function () { reportOffset = 0; renderReport(); });
+  $("printBtn").addEventListener("click", function () { window.print(); });
+
+  $("cgDate").addEventListener("change", renderCaregiver);
+  $("cgTodayBtn").addEventListener("click", function () { $("cgDate").value = todayStr(); renderCaregiver(); });
+
+  $("saveNameBtn").addEventListener("click", savePatientName);
+  $("loadSampleBtn").addEventListener("click", loadSampleData);
+  $("clearDataBtn").addEventListener("click", clearAllData);
+
+  $("getStartedBtn").addEventListener("click", function () {
+    document.body.classList.remove("welcome");
+    setView("dashboard");
+  });
+  // Show the landing page first; the dashboard opens when Get Started is selected.
+  document.body.classList.add("welcome");
+  renderBanner();
+  checkReminders();
+  setInterval(tick, 30000);
+}
+
+init();
+</script>
+</body>
+</html>
